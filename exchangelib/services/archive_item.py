@@ -1,4 +1,5 @@
 from ..util import create_element, MNS
+from ..version import EXCHANGE_2013
 from .common import EWSAccountService, EWSPooledMixIn, create_folder_ids_element, create_item_ids_element
 
 
@@ -16,6 +17,8 @@ class ArchiveItem(EWSAccountService, EWSPooledMixIn):
         :param items: a list of (id, changekey) tuples or Item objects
         :return: None
         """
+        if self.protocol.version.build < EXCHANGE_2013:
+            raise NotImplementedError('%s is only supported for Exchange 2013 servers and later' % self.SERVICE_NAME)
         return self._pool_requests(payload_func=self.get_payload, **dict(items=items, to_folder=to_folder))
 
     def _get_elements_in_response(self, response):
