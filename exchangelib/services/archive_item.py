@@ -18,6 +18,15 @@ class ArchiveItem(EWSAccountService, EWSPooledMixIn):
         """
         return self._pool_requests(payload_func=self.get_payload, **dict(items=items, to_folder=to_folder))
 
+    def _get_elements_in_response(self, response):
+        for msg in response:
+            container_or_exc = self._get_element_container(message=msg, name=self.element_container_name)
+            if isinstance(container_or_exc, (bool, Exception)):
+                yield container_or_exc
+            else:
+                assert len(container_or_exc) == 0
+                yield True
+
     def get_payload(self, items, to_folder):
         archiveitem = create_element('m:%s' % self.SERVICE_NAME)
         folder_id = create_folder_ids_element(tag='m:ArchiveSourceFolderId', folders=[to_folder],
