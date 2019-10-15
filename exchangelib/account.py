@@ -29,7 +29,7 @@ from .items import Item, BulkCreateResult, HARD_DELETE, \
 from .properties import Mailbox, SendingAs
 from .queryset import QuerySet
 from .services import ExportItems, UploadItems, GetItem, CreateItem, UpdateItem, DeleteItem, MoveItem, SendItem, \
-    CopyItem, GetUserOofSettings, SetUserOofSettings, GetMailTips
+    CopyItem, GetUserOofSettings, SetUserOofSettings, GetMailTips, ArchiveItem
 from .settings import OofSettings
 from .util import get_domain, peek
 
@@ -552,6 +552,24 @@ class Account(object):
         return list(
             i if isinstance(i, Exception) else Item.id_from_xml(i)
             for i in self._consume_item_service(service_cls=MoveItem, items=ids, chunk_size=chunk_size, kwargs=dict(
+                to_folder=to_folder,
+            ))
+        )
+
+    def bulk_archive(self, ids, to_folder, chunk_size=None):
+        """Archive items to a folder in the archive mailbox. An archive mailbox must be enabled in order for this
+        to work.
+
+        :param ids: an iterable of either (id, changekey) tuples or Item objects.
+        :param to_folder: The destination folder of the archive operation
+        :param chunk_size: The number of items to send to the server in a single request
+        :return: None
+        """
+        if not isinstance(to_folder, BaseFolder):
+            raise ValueError("'to_folder' %r must be a Folder instance" % to_folder)
+        return list(
+            i if isinstance(i, Exception) else Item.id_from_xml(i)
+            for i in self._consume_item_service(service_cls=ArchiveItem, items=ids, chunk_size=chunk_size, kwargs=dict(
                 to_folder=to_folder,
             ))
         )
