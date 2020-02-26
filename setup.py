@@ -29,7 +29,7 @@ def read(file_name):
 
 
 setup(
-    name='exchangelib',
+    name='exchangelibtmp',
     version=__version__,
     author='Erik Cederstrand',
     author_email='erik@cederstrand.dk',
